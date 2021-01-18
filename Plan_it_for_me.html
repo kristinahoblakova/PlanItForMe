@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset='utf-8'>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+
+ <!-- CSS pre aplikáciu-->
+    <style>
+        /* Štýl pre názov h2 teda pre Plan it for me! */
+        h2 {
+            font-family: "Sofia", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-width: 150px;
+        }
+
+        /* Zahŕňa výplň a orámovanie do celkovej šírky a výšky prvku */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Odstráni okraje a výplň zo zoznamu*/
+        ul {
+            margin: 10 ;
+            padding: 2rem 2rem;
+            position : center;
+        }
+
+        /* Štýl pre zoznam hodnôt */
+        ul li {
+            cursor: pointer;
+            position: relative;
+            padding: 12px 8px 12px 40px;
+            list-style-type: none;
+            background: #eee;
+            font-size: 18px;
+            transition: 0.2s;
+
+            align-items: center;
+
+
+
+            /* Zadané hodnoty nám zobrazi ako nevybrané */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+        }
+
+        /*Nastavý všetky nepárne hodnoty inej farby, konkrétne  zebrované teda pruhované*/
+
+        ul li:nth-child(odd) {
+            background: #f0c5eb;
+        }
+
+        /* Tmavšia farba pozadia pri umiestnení kurzora myši*/
+        ul li:hover {
+            background: #ddd;
+        }
+
+        /* Po kliknutí sa pridá farbu pozadia a prečiarkne sa text*/
+        ul li.checked {
+            background: #98f598;
+            color: #fff;
+            text-decoration: line-through;
+        }
+
+        /*Po kliknutí pridá značku „začiarknuté“ */
+        ul li.checked::before {
+            content: '';
+            position: absolute;
+            border-color: #fff;
+            border-style: solid;
+            border-width: 0 2px 2px 0;
+            top: 10px;
+            left: 16px;
+            transform: rotate(45deg);
+            height: 15px;
+            width: 7px;
+        }
+
+        /* Úprava pre close button */
+        .close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 12px 16px 12px 16px;
+        }
+
+        .close:hover {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Úprava pre header */
+        .header  {
+            padding: 4rem 8rem;
+            /*display: inline-block;*/
+            border: 3px solid #333333;
+            font-size: 2.5rem;
+            border-radius: 2% 6% 5% 4% / 1% 1% 2% 4%;
+            letter-spacing: 0.3ch;
+            background: #ffffff;
+            position: center;
+            align: center
+
+        &::before {
+             content: '';
+             border: 2px solid #353535;
+             display: block;
+             width: 100%;
+             height: 100%;
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate3d(-50%, -50%, 0) scale(1.015) rotate(0.5deg);
+             border-radius: 1% 1% 2% 4% / 2% 6% 5% 4%;
+         }
+        }
+
+        /* Vyčistý priestor z header */
+        .header:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Úprava pre input */
+        input {
+            margin: 0;
+            border: dotted;
+            border-radius: 0;
+            width: 75%;
+            padding: 10px;
+            float: left;
+            font-size: 16px;
+
+
+        }
+
+        /* Úprava pre Add button */
+        .addBtn {
+            padding: 10px;
+            margin: 0;
+            width: 20%;
+            background: #e8a5bf;
+            color: #555;
+            float: left;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+
+        }
+
+        .addBtn:hover {
+            background-color: #bbb;
+        }
+        /* Úprava pre čas  */
+        .date{
+            font-family: "Sofia", sans-serif;
+            padding: 13px;
+            width: 15%;
+            font-size: 16px;
+            align: center;
+
+
+        }
+        /* Úprava pre footer */
+        footer {
+
+            font-family: "Noto Sans Old Italic";
+            background-color: #e8a5bf;
+            padding: 20px 15px;
+            color: black;
+            text-align: center;
+            border: dotted;
+
+
+        }
+
+
+
+
+    </style>
+    <!-- Koniec css -->
+
+    <!-- Začiatok html -->
+
+</head>
+<body onload="fetch()">
+
+
+<div align="center"  id="myDIV" class="header">
+    <h2 style="margin:5px"> Plan it for me !</h2>
+    <input type="text" id="myInput" placeholder="Čo mám dnes v pláne?">
+    <span onclick="newElement()" > <button class="addBtn">Pridať</button></span>
+</div>
+
+<!-- priestor pre aktuálny dátum -->
+<div>
+    <div id="date" class="date">
+    </div>
+</div>
+<!-- zoznam zadaných prvkokv -->
+<ul id="myUL">
+    <div align = "center" id="storage">
+    </div>
+</ul>
+
+
+
+<!-- Začiatok javascriptu -->
+<script>
+    // Vytvorí tlačidlo „zatvoriť“ a pripojí ho ku každej položke zoznamu
+    var myNodelist = document.getElementsByTagName("LI");
+    var i;
+    for (i = 0; i < myNodelist.length; i++) {
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        myNodelist[i].appendChild(span);
+    }
+
+    // Kliknutím na tlačidlo zatvorenia sa skryje aktuálnu položku zoznamu
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+            var div = this.parentElement;
+            div.style.display = "none";
+        }
+    }
+    // Pridanie aktuálneho dátum
+
+    var d = new Date();
+    document.getElementById("date").innerHTML = d.toLocaleDateString("sk-SK");
+
+
+
+    // Po kliknutí na položku v zozname sa pridá symbol „začiarknuté“
+    var list = document.querySelector('ul');
+    list.addEventListener('click', function(ev) {
+        if (ev.target.tagName === 'LI') {
+            ev.target.classList.toggle('checked');
+        }
+    }, false);
+
+
+
+
+    // Kliknutím na tlačidlo „Pridať“ sa vytvorí nová položka v zoznamu
+    function newElement() {
+        var li = document.createElement("li");
+        var inputValue = document.getElementById("myInput").value;
+        var t = document.createTextNode(inputValue);
+        li.appendChild(t);
+        if (inputValue === '') {
+            alert("Musíš niečo napísať!");
+        } else {
+            document.getElementById("myUL").appendChild(li);
+        }
+        document.getElementById("myInput").value = "";
+
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        li.appendChild(span);
+
+        for (i = 0; i < close.length; i++) {
+            close[i].onclick = function() {
+                var div = this.parentElement;
+                div.style.display = "none";
+            }
+        }
+    }
+
+    // použitie localstorage
+    $('button').on('click',function() {
+        window.localStorage.setItem("myUL", $('myInput').val());
+        fetch();
+    });
+
+    function fetch() {
+        $('#storage').html(window.localStorage.getItem('myUL'));
+    }
+
+</script>
+<!-- Koniec javascriptu -->
+
+<!-- Footer pre aplikáciu -->
+<footer class="footer">
+    <small> Vytvorené na predmet <span>Programovacie Jazyky</span> <a> <br> Kristína Hobľáková III.MP</a>
+    </small>
+
+</footer>
+
+</body>
+</html>
+
