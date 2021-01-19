@@ -52,7 +52,7 @@
 
         }
 
-        /*Nastavý všetky nepárne hodnoty inej farby, konkrétne  zebrované teda pruhované*/
+        /*Nastavenie pre všetky nepárne hodnoty inej farby, konkrétne  zebrované teda pruhované*/
 
         ul li:nth-child(odd) {
             background: #f0c5eb;
@@ -208,10 +208,7 @@
     </div>
 </div>
 <!-- zoznam zadaných prvkokv -->
-<ul id="myUL">
-    <div align = "center" id="storage">
-    </div>
-</ul>
+<ul id="myUL" is="storage"></ul>
 
 
 
@@ -228,14 +225,15 @@
         myNodelist[i].appendChild(span);
     }
 
-    // Kliknutím na tlačidlo zatvorenia sa skryje aktuálnu položku zoznamu
+    // Kliknutím na tlačidlo zatvorenia sa zmaže aktuálnu položku zoznamu
     var close = document.getElementsByClassName("close");
     var i;
     for (i = 0; i < close.length; i++) {
         close[i].onclick = function() {
-            var div = this.parentElement;
-            div.style.display = "none";
-        }
+             var div = this.parentElement.remove();
+                // aktualizácia localstorage
+                updateStorage();
+            }
     }
     // Pridanie aktuálneho dátum
 
@@ -255,17 +253,32 @@
 
 
 
-    // Kliknutím na tlačidlo „Pridať“ sa vytvorí nová položka v zoznamu
-    function newElement() {
-        var li = document.createElement("li");
-        var inputValue = document.getElementById("myInput").value;
-        var t = document.createTextNode(inputValue);
-        li.appendChild(t);
-        if (inputValue === '') {
-            alert("Musíš niečo napísať!");
+    // Kliknutím na tlačidlo „Pridať“ sa vytvorí nová položka v zozname
+    function newElement(text = null) {
+        if (text === null) {
+            if (inputValue === '') {
+                alert("Musíš niečo napísať!");
+                return;
+            }
+
+            var inputValue = document.getElementById("myInput").value;
+            // uloženie do localstorage
+            var data = JSON.parse(window.localStorage.getItem("myUL"));
+            if (data === null) {
+                data = [];
+            }
+            data.push(inputValue);
+            window.localStorage.setItem("myUL", JSON.stringify(data));
         } else {
-            document.getElementById("myUL").appendChild(li);
+            var inputValue = text;
         }
+
+        var li = document.createElement("li");
+        li.className = "myULItem";
+        var t = document.createTextNode(inputValue);
+
+        li.appendChild(t);
+        document.getElementById("myUL").appendChild(li);
         document.getElementById("myInput").value = "";
 
         var span = document.createElement("SPAN");
@@ -276,22 +289,30 @@
 
         for (i = 0; i < close.length; i++) {
             close[i].onclick = function() {
-                var div = this.parentElement;
-                div.style.display = "none";
+                var div = this.parentElement.remove();
+                // aktualizácia localstorage
+               updateStorage();
             }
         }
     }
 
-    // použitie localstorage
-    $('button').on('click',function() {
-        window.localStorage.setItem("myUL", $('myInput').val());
-        fetch();
-    });
-
     function fetch() {
-        $('#storage').html(window.localStorage.getItem('myUL'));
-    }
+        var data = JSON.parse(window.localStorage.getItem("myUL"));
+        for(var i = 0; i < data.length;i++) {
+            newElement(data[i]);
+        }
 
+    }
+// funkcia pre update localstorage 
+    function updateStorage() {
+         var items = document.getElementsByTagName("LI");
+         var data = [];
+         for(var j = 0; j < items.length;j++) {
+            var text = items[j].innerText;
+            data.push(text.slice(0, -1));
+        }
+        window.localStorage.setItem("myUL", JSON.stringify(data));
+    }
 </script>
 <!-- Koniec javascriptu -->
 
